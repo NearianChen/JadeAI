@@ -25,9 +25,9 @@
 [![Linux.do](https://img.shields.io/badge/Linux.do-社区-blue)](https://linux.do/)
 
 
-Lark Group
+加入飞书群
 
-<img src="images/lark-chat.png" width="200" alt="Lark Group QR Code" />
+![lark-chat](images/lark-chat.png)
 
 
 ---

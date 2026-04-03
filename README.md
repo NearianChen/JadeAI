@@ -27,9 +27,7 @@ Join our groups for discussion and support:
 
 Lark Group
 
-<img src="images/lark-chat.png" width="200" alt="Lark Group QR Code" />
-
----
+![lark-chat](images/lark-chat.png)
 
 ## Screenshots
 
