@@ -130,7 +130,7 @@ const PRESET_THEMES: PresetTheme[] = [
 const DEFAULT_THEME: ThemeConfig = {
   primaryColor: '#1a1a1a',
   accentColor: '#3b82f6',
-  fontFamily: 'Inter',
+  fontFamily: 'Maple Mono NF CN',
   fontSize: 'medium',
   lineSpacing: 1.5,
   margin: { top: 20, right: 20, bottom: 20, left: 20 },
@@ -139,6 +139,7 @@ const DEFAULT_THEME: ThemeConfig = {
 };
 
 const FONT_OPTIONS = [
+  'Maple Mono NF CN',
   'Inter',
   'Georgia',
   'Helvetica',

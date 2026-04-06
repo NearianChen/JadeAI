@@ -1,6 +1,25 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@font-face {
+  font-family: 'Maple Mono NF CN';
+  src: url('/fonts/MapleMono-NF-CN-Regular.ttf') format('truetype');
+  font-weight: normal; /* Regular */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Maple Mono NF CN';
+  src: url('/fonts/MapleMono-NF-CN-Bold.ttf') format('truetype');
+  font-weight: bold; /* Bold */
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Maple Mono NF CN';
+  src: url('/fonts/MapleMono-NF-CN-Italic.ttf') format('truetype');
+  font-weight: normal; /* Normal */
+  font-style: italic;
+}
 
 @custom-variant dark (&:is(.dark *));
 

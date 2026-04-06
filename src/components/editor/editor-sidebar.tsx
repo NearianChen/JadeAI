@@ -201,7 +201,8 @@ export function EditorSidebar({ sections, onAddSection, onReorderSections }: Edi
 
   const existingTypes = new Set(sections.map((s) => s.type));
   const availableTypes = SECTION_TYPES.filter((type) => {
-    if (type === 'custom') return true;
+    const alwaysRepeatable = ['custom', 'work_experience', 'projects', 'education'];
+    if (alwaysRepeatable.includes(type)) return true;
     return !existingTypes.has(type);
   });
 
