@@ -12,7 +12,8 @@ const COLORS = {
   blue: '#61afef',
   orange: '#e5c07b',
   bgGray: '#f0f0f0',
-  textGray: '#636d83'
+  textGray: '#636d83',
+  infowight: '#abb2bf'
 };
 
 // --- 提取复用组件 1: Highlights 列表 ---
@@ -69,19 +70,49 @@ export function DeveloperTemplate({ resume }: { resume: Resume }) {
             <h1 className="text-2xl font-bold" style={{ color: COLORS.green }}>{pi.fullName || 'Your Name'}</h1>
             {pi.jobTitle && <p className="mt-0.5 text-sm" style={{ color: COLORS.blue }}>{`// ${pi.jobTitle}`}</p>}
             <div className="mt-2 flex flex-wrap gap-3 text-xs text-zinc-400">
-              {pi.age && <span>{pi.age}</span>}
-              {pi.politicalStatus && <span>{pi.politicalStatus}</span>}
-              {pi.gender && <span>{pi.gender}</span>}
-              {pi.ethnicity && <span>{pi.ethnicity}</span>}
-              {pi.hometown && <span>{pi.hometown}</span>}
-              {pi.maritalStatus && <span>{pi.maritalStatus}</span>}
-              {pi.yearsOfExperience && <span>{pi.yearsOfExperience}</span>}
-              {pi.educationLevel && <span>{pi.educationLevel}</span>}
-              {pi.email && <span>{pi.email}</span>}
+              {pi.age && <span style={{ color: COLORS.infowight }}>{pi.age}</span>}
+              {pi.politicalStatus && <span style={{ color: COLORS.infowight }}>{pi.politicalStatus}</span>}
+              {pi.gender && <span style={{ color: COLORS.infowight }}>{pi.gender}</span>}
+              {pi.ethnicity && <span style={{ color: COLORS.infowight }}>{pi.ethnicity}</span>}
+              {pi.hometown && <span style={{ color: COLORS.infowight }}>{pi.hometown}</span>}
+              {pi.maritalStatus && <span style={{ color: COLORS.infowight }}>{pi.maritalStatus}</span>}
+              {pi.yearsOfExperience && <span style={{ color: COLORS.infowight }}>{pi.yearsOfExperience}</span>}
+              {pi.educationLevel && <span style={{ color: COLORS.infowight }}>{pi.educationLevel}</span>}
+              {pi.email && (
+                <a
+                  href={`mailto:${pi.email}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-zinc-200 transition-colors"
+                  style={{color: COLORS.infowight}}
+                >
+                  <svg
+                    viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10673"
+                    width="20" height="20" fill="currentColor">
+                    <path d="M170.666667 128l682.666667 0q52.992 0 90.496 37.504t37.504 90.496l0 512q0 52.992-37.504 90.496t-90.496 37.504l-682.666667 0q-52.992 0-90.496-37.504t-37.504-90.496l0-512q0-52.992 37.504-90.496t90.496-37.504zM896 768l0-466.005333-357.333333 285.994667q-11.349333 9.344-26.666667 9.344t-26.666667-9.344l-357.333333-285.994667 0 466.005333q0 17.664 12.501333 30.165333t30.165333 12.501333l682.666667 0q17.664 0 30.165333-12.501333t12.501333-30.165333zM853.333333 213.333333l-682.666667 0q-6.314667 0-13.994667 2.346667l355.328 284.330667 355.328-284.330667q-7.68-2.346667-13.994667-2.346667z" p-id="10674"></path></svg>
+                  <span>{pi.email}</span>
+                </a>
+              )}
               {pi.phone && <span>{pi.phone}</span>}
               {pi.wechat && <span>{pi.wechat}</span>}
               {pi.location && <span>{pi.location}</span>}
-              {pi.website && <span>{pi.website}</span>}
+              {pi.website && (
+                <a
+                  href={pi.website.startsWith('http') ? pi.website : `https://github.com/${pi.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-zinc-200 transition-colors"
+                  style={{color: COLORS.infowight}}
+                >
+                  <svg
+                    viewBox="0 0 1024 1024" version="1.1"
+                    xmlns="http://www.w3.org/2000/svg" p-id="8680"
+                    width="20" height="20" fill="currentColor"
+                    >
+                    <path d="M950.857143 512q0 143.428571-83.714286 258t-216.285714 158.571429q-15.428571 2.857143-22.571429-4t-7.142857-17.142857l0-120.571429q0-55.428571-29.714286-81.142857 32.571429-3.428571 58.571429-10.285714t53.714286-22.285714 46.285714-38 30.285714-60 11.714286-86q0-69.142857-45.142857-117.714286 21.142857-52-4.571429-116.571429-16-5.142857-46.285714 6.285714t-52.571429 25.142857l-21.714286 13.714286q-53.142857-14.857143-109.714286-14.857143t-109.714286 14.857143q-9.142857-6.285714-24.285714-15.428571t-47.714286-22-49.142857-7.714286q-25.142857 64.571429-4 116.571429-45.142857 48.571429-45.142857 117.714286 0 48.571429 11.714286 85.714286t30 60 46 38.285714 53.714286 22.285714 58.571429 10.285714q-22.857143 20.571429-28 58.857143-12 5.714286-25.714286 8.571429t-32.571429 2.857143-37.428571-12.285714-31.714286-35.714286q-10.857143-18.285714-27.714286-29.714286t-28.285714-13.714286l-11.428571-1.714286q-12 0-16.571429 2.571429t-2.857143 6.571429 5.142857 8 7.428571 6.857143l4 2.857143q12.571429 5.714286 24.857143 21.714286t18 29.142857l5.714286 13.142857q7.428571 21.714286 25.142857 35.142857t38.285714 17.142857 39.714286 4 31.714286-2l13.142857-2.285714q0 21.714286 2.857143 50.857143t2.857143 30.857143q0 10.285714-7.428571 17.142857t-22.857143 4q-132.571429-44-216.285714-158.571429t-83.714286-258q0-119.428571 58.857143-220.285714t159.714286-159.714286 220.285714-58.857143 220.285714 58.857143 159.714286 159.714286 58.857143 220.285714z" p-id="8681"></path></svg>
+                  <span>{pi.website}</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -127,7 +158,7 @@ function DeveloperSectionContent({ section, resume }: { section: any; resume: Re
                   <span className="text-sm font-bold" style={{ color: COLORS.dark }}>{item.position}</span>
                   {item.company && <span className="text-sm" style={{ color: COLORS.blue }}> @ {item.company}</span>}
                 </div>
-                <span className="shrink-0 rounded px-2 py-0.5 text-[10px] font-medium" style={{ background: COLORS.bgGray, color: COLORS.textGray }}>
+                <span className="shrink-0 text-xs text-zinc-400" >
                   {item.startDate} – {item.endDate || (item.current ? presentText : '')}
                 </span>
               </div>
@@ -187,7 +218,7 @@ function DeveloperSectionContent({ section, resume }: { section: any; resume: Re
                   )}
                 </div>
                 {item.startDate && (
-                  <span className="shrink-0 rounded px-2 py-0.5 text-[10px] font-medium" style={{ background: COLORS.bgGray, color: COLORS.textGray }}>
+                  <span className="shrink-0 text-xs text-zinc-400">
                     {item.startDate} – {item.endDate || presentText}
                   </span>
                 )}
