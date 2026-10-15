@@ -1,13 +1,17 @@
 import type { resumeRepository } from '@/lib/db/repositories/resume.repository';
 import { BACKGROUND_TEMPLATES } from '@/lib/constants';
+import { DEFAULT_THEME, resumeFontStack } from '@/lib/resume-theme';
+export { DEFAULT_THEME } from '@/lib/resume-theme';
 import type {
   PersonalInfoContent,
+  QrCodesContent,
   SkillsContent,
   SummaryContent,
 } from '@/types/resume';
 
 export type ResumeWithSections = NonNullable<Awaited<ReturnType<typeof resumeRepository.findById>>>;
 export type Section = ResumeWithSections['sections'][number];
+type QrCodesContentWithSvgs = QrCodesContent & { _qrSvgs?: Record<string, string> };
 
 // ─── Helpers ──────────────────────────────────────────────────
 
@@ -69,11 +73,11 @@ export function md(text: unknown): string {
 // ─── Section empty check ──────────────────────────────────────
 
 export function isSectionEmpty(section: Section): boolean {
-  const content = section.content as any;
+  const content = section.content;
   if (section.type === 'summary') return !(content as SummaryContent).text;
   if (section.type === 'skills') {
     const categories = (content as SkillsContent).categories;
-    return !categories?.length || categories.every((cat: any) => !cat.skills?.length);
+    return !categories?.length || categories.every(cat => !cat.skills?.length);
   }
   if ('items' in content) return !content.items?.length;
   return false;
@@ -103,11 +107,11 @@ export function buildHighlights(highlights: string[] | undefined, liClass: strin
 // ─── QR codes inline HTML (SVGs pre-generated in builders.ts) ─
 
 export function buildQrCodesHtml(section: Section): string {
-  const c = section.content as any;
-  const svgs = (c._qrSvgs || {}) as Record<string, string>;
-  const items = (c.items || []).filter((q: any) => q.url?.trim() && svgs[q.id]);
+  const c = section.content as QrCodesContentWithSvgs;
+  const svgs = c._qrSvgs || {};
+  const items = (c.items || []).filter(q => q.url?.trim() && svgs[q.id]);
   if (items.length === 0) return '';
-  return `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px 24px;padding-top:4px">${items.map((qr: any) =>
+  return `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px 24px;padding-top:4px">${items.map(qr =>
     `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:96px">${svgs[qr.id]}<span style="font-size:10px;color:#6b7280;line-height:1.2;text-align:center;word-break:break-all;max-width:96px">${esc(qr.label)}</span></div>`
   ).join('')}</div>`;
 }
@@ -118,17 +122,6 @@ const FONT_SIZE_SCALE: Record<string, { body: string; h1: string; h2: string; h3
   small:  { body: '12px', h1: '22px', h2: '15px', h3: '13px' },
   medium: { body: '14px', h1: '26px', h2: '17px', h3: '15px' },
   large:  { body: '16px', h1: '30px', h2: '19px', h3: '17px' },
-};
-
-export const DEFAULT_THEME = {
-  primaryColor: '#1a1a1a',
-  accentColor: '#3b82f6',
-  fontFamily: 'Inter',
-  fontSize: 'medium',
-  lineSpacing: 1.5,
-  margin: { top: 20, right: 20, bottom: 20, left: 20 },
-  sectionSpacing: 16,
-  avatarStyle: 'oneInch' as const,
 };
 
 function isDark(hex: string): boolean {
@@ -146,8 +139,10 @@ export function buildExportThemeCSS(theme: typeof DEFAULT_THEME, template: strin
   const needsPadding = !BACKGROUND_TEMPLATES.has(template);
   const primaryIsDark = isDark(theme.primaryColor);
   return `
+    ${sel} > div, ${sel} > div * {
+      font-family: ${resumeFontStack(theme.fontFamily)} !important;
+    }
     ${sel} > div {
-      font-family: ${theme.fontFamily}, 'Noto Sans SC', sans-serif !important;
       line-height: ${theme.lineSpacing} !important;
       ${needsPadding ? `padding-top: ${m.top}px !important; padding-right: ${m.right}px !important; padding-bottom: ${m.bottom}px !important; padding-left: ${m.left}px !important;` : ''}
       --base-body-size: ${fs.body};

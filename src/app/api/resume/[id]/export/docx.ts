@@ -8,7 +8,7 @@ import type {
   PersonalInfoContent, SummaryContent, WorkExperienceContent,
   EducationContent, SkillsContent, ProjectsContent,
   CertificationsContent, LanguagesContent, CustomContent,
-  GitHubContent, QrCodesContent,
+  GitHubContent, QrCodesContent, ThemeConfig,
 } from '@/types/resume';
 import QRCode from 'qrcode';
 import { type ResumeWithSections, getPersonalInfo, visibleSections, DEFAULT_THEME, safe } from './utils';
@@ -149,13 +149,13 @@ function isDark(hex: string) {
 }
 
 function resolveTheme(cfg: unknown, template?: string): DocxTheme {
-  const userCfg = (cfg as Record<string, unknown>) || {};
+  const userCfg = (cfg as Partial<ThemeConfig>) || {};
   const tc = template ? TEMPLATE_STYLES[template] : undefined;
 
   // Merge: global defaults → template colors → user overrides
-  const base = { ...DEFAULT_THEME } as Record<string, unknown>;
+  const base: ThemeConfig = { ...DEFAULT_THEME };
   if (tc?.accent && !userCfg.accentColor) base.accentColor = tc.accent;
-  const t = { ...base, ...userCfg } as typeof DEFAULT_THEME;
+  const t: ThemeConfig = { ...base, ...userCfg };
 
   const fs = FONT_SIZES[t.fontSize] || FONT_SIZES.medium;
   const primary = strip(t.primaryColor);

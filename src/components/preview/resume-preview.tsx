@@ -1,6 +1,7 @@
 'use client';
 
 import { useId } from 'react';
+import { DEFAULT_THEME, MAPLE_FONT_FAMILY, resumeFontStack } from '@/lib/resume-theme';
 import type { Resume, ThemeConfig } from '@/types/resume';
 import { BACKGROUND_TEMPLATES } from '@/lib/constants';
 import { ClassicTemplate } from './templates/classic';
@@ -129,17 +130,6 @@ const FONT_SIZE_SCALE: Record<string, { body: string; h1: string; h2: string; h3
   large:  { body: '16px', h1: '30px', h2: '19px', h3: '17px' },
 };
 
-const DEFAULT_THEME: ThemeConfig = {
-  primaryColor: '#1a1a1a',
-  accentColor: '#3b82f6',
-  fontFamily: 'Inter',
-  fontSize: 'medium',
-  lineSpacing: 1.5,
-  margin: { top: 20, right: 20, bottom: 20, left: 20 },
-  sectionSpacing: 16,
-  avatarStyle: 'oneInch',
-};
-
 /** Returns true if a hex colour is dark (luminance < 0.4) */
 function isDark(hex: string): boolean {
   const c = hex.replace('#', '');
@@ -156,10 +146,36 @@ function buildThemeCSS(scopeId: string, theme: ThemeConfig, template: string): s
   const m = theme.margin;
   const needsPadding = !BACKGROUND_TEMPLATES.has(template);
   const primaryIsDark = isDark(theme.primaryColor);
+  const localFontFaces = theme.fontFamily === MAPLE_FONT_FAMILY ? `
+    @font-face {
+      font-family: '${MAPLE_FONT_FAMILY}';
+      src: url('/fonts/MapleMono-NF-CN-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${MAPLE_FONT_FAMILY}';
+      src: url('/fonts/MapleMono-NF-CN-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${MAPLE_FONT_FAMILY}';
+      src: url('/fonts/MapleMono-NF-CN-Italic.ttf') format('truetype');
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+  ` : '';
 
   return `
+    ${localFontFaces}
+    ${s} > div, ${s} > div * {
+      font-family: ${resumeFontStack(theme.fontFamily)} !important;
+    }
     ${s} > div {
-      font-family: ${theme.fontFamily}, 'Noto Sans SC', sans-serif !important;
       line-height: ${theme.lineSpacing} !important;
       ${needsPadding ? `padding-top: ${m.top}px !important; padding-right: ${m.right}px !important; padding-bottom: ${m.bottom}px !important; padding-left: ${m.left}px !important;` : ''}
       --base-body-size: ${fs.body};
@@ -246,11 +262,15 @@ export function ResumePreview({ resume }: ResumePreviewProps) {
 
   return (
     <>
-      {/* Load the same Google Fonts used in PDF/HTML export so preview renders
-          with identical font metrics (Inter for Latin, Noto Sans SC for CJK). */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      {/* Maple is served from the project's local font files. */}
+      {theme.fontFamily !== MAPLE_FONT_FAMILY && (
+        <>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+          {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        </>
+      )}
       <div data-theme-scope={scopeId}>
         <style dangerouslySetInnerHTML={{ __html: buildThemeCSS(scopeId, theme, safeResume.template) }} />
         <Template resume={safeResume} />

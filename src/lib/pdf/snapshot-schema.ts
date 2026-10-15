@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { TEMPLATES } from '@/lib/constants';
 import { normalizeSections } from '@/lib/resume/normalize-content';
+import { MAPLE_FONT_FAMILY } from '@/lib/resume-theme';
 import { PDF_LAYOUTS } from './layout';
 
 export const MAX_PDF_SNAPSHOT_BYTES = 2 * 1024 * 1024;
@@ -88,7 +89,7 @@ const margin = z.number().min(0).max(60);
 const theme = z.strictObject({
   primaryColor: color.optional(), accentColor: color.optional(),
   fontFamily: z.enum(['Inter', 'Georgia', 'Helvetica', 'Arial', 'Palatino', 'Verdana',
-    'Times New Roman', 'Garamond', 'Courier New']).optional(),
+    'Times New Roman', 'Garamond', 'Courier New', MAPLE_FONT_FAMILY]).optional(),
   fontSize: z.enum(['small', 'medium', 'large']).optional(),
   lineSpacing: z.number().min(1).max(2.5).optional(),
   margin: z.strictObject({ top: margin, right: margin, bottom: margin, left: margin }).optional(),

@@ -5,6 +5,12 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  outputFileTracingIncludes: {
+    '/api/resume/*/export': [
+      './public/fonts/MapleMono-NF-CN-*.ttf',
+      './public/icons/*.svg',
+    ],
+  },
   serverExternalPackages: ['better-sqlite3', 'puppeteer-core', '@sparticuz/chromium-min'],
 };
 

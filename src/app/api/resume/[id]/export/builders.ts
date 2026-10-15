@@ -1,7 +1,10 @@
-import { esc, buildExportThemeCSS, DEFAULT_THEME, type ResumeWithSections } from './utils';
+import { esc, buildExportThemeCSS, DEFAULT_THEME, type ResumeWithSections, type Section } from './utils';
+import { MAPLE_FONT_FAMILY } from '@/lib/resume-theme';
+import { mapleFontCSS } from '@/lib/pdf/maple-fonts';
 import { EXPORT_TAILWIND_CSS } from '@/lib/pdf/export-tailwind-css';
 import { BACKGROUND_TEMPLATES } from '@/lib/constants';
 import { generateQrSvg } from '@/lib/qrcode';
+import type { QrCodesContent, ThemeConfig } from '@/types/resume';
 import type { PdfLayout } from '@/lib/pdf/layout';
 import { CONTINUOUS_LAYOUT_CSS } from '@/lib/pdf/continuous-layout';
 import { buildClassicHtml } from './templates/classic';
@@ -152,15 +155,16 @@ function isValidQrUrl(str: string): boolean {
 /** Pre-generate QR code SVGs and attach to qr_codes section content
  *  so sync template builders can render them inline. */
 async function preGenerateQrSvgs(resume: ResumeWithSections): Promise<void> {
-  const qrSection = resume.sections.find((s: any) => s.type === 'qr_codes');
+  const qrSection = resume.sections.find((section: Section) => section.type === 'qr_codes');
   if (!qrSection || qrSection.visible === false) return;
-  const items = ((qrSection.content as any).items || []).filter((q: any) => isValidQrUrl(q.url));
+  const qrContent = qrSection.content as QrCodesContent & { _qrSvgs?: Record<string, string> };
+  const items = (qrContent.items || []).filter(q => isValidQrUrl(q.url));
   if (items.length === 0) return;
   const svgs: Record<string, string> = {};
   for (const qr of items) {
     try { svgs[qr.id] = await generateQrSvg(qr.url, 80); } catch { /* skip */ }
   }
-  (qrSection.content as any)._qrSvgs = svgs;
+  qrContent._qrSvgs = svgs;
 }
 
 export async function generateHtml(resume: ResumeWithSections, forPdf: boolean | PdfLayout = false): Promise<string> {
@@ -168,8 +172,10 @@ export async function generateHtml(resume: ResumeWithSections, forPdf: boolean |
   await preGenerateQrSvgs(resume);
   const builder = TEMPLATE_BUILDERS[resume.template] || buildClassicHtml;
   const bodyHtml = builder(resume);
-  const theme = { ...DEFAULT_THEME, ...((resume as any).themeConfig || {}) };
+  const themeConfig = resume.themeConfig as Partial<ThemeConfig> | null;
+  const theme = { ...DEFAULT_THEME, ...(themeConfig || {}) };
   const themeCSS = buildExportThemeCSS(theme, resume.template);
+  const fontCSS = theme.fontFamily === MAPLE_FONT_FAMILY ? await mapleFontCSS() : '';
   const isBackground = BACKGROUND_TEMPLATES.has(resume.template);
 
   const fullDarkBg = FULL_DARK_TEMPLATES[resume.template];
@@ -250,10 +256,13 @@ export async function generateHtml(resume: ResumeWithSections, forPdf: boolean |
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${esc(resume.title)}</title>
   <style>${EXPORT_TAILWIND_CSS}</style>
+  ${theme.fontFamily !== MAPLE_FONT_FAMILY ? `
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  ` : ''}
   <style>
+    ${fontCSS}
     body { margin: 0; display: flex; justify-content: center; padding: 40px 20px; background: #f4f4f5; min-height: 100vh; }
     @media print { body { padding: 0 !important; background: white !important; } .resume-export > div { box-shadow: none !important; } }
     ${themeCSS}
@@ -288,7 +297,7 @@ export async function generateHtml(resume: ResumeWithSections, forPdf: boolean |
   </style>
 </head>
 <body>
-  <div class="resume-export" data-avatar-style="${esc((resume as any).themeConfig?.avatarStyle || 'oneInch')}">
+  <div class="resume-export" data-avatar-style="${esc(themeConfig?.avatarStyle || 'oneInch')}">
     ${bodyHtml}
   </div>
 </body>

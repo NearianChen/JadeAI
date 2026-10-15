@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Palette,
@@ -36,6 +36,7 @@ import { TEMPLATES } from '@/lib/constants';
 import { templateLabelsMap } from '@/lib/template-labels';
 import { TemplateThumbnail } from '@/components/dashboard/template-thumbnail';
 import { cn } from '@/lib/utils';
+import { DEFAULT_THEME, MAPLE_FONT_FAMILY } from '@/lib/resume-theme';
 import type { ThemeConfig } from '@/types/resume';
 
 // -- Preset Themes --
@@ -140,18 +141,8 @@ const PRESET_THEMES: PresetTheme[] = [
   },
 ];
 
-const DEFAULT_THEME: ThemeConfig = {
-  primaryColor: '#1a1a1a',
-  accentColor: '#3b82f6',
-  fontFamily: 'Inter',
-  fontSize: 'medium',
-  lineSpacing: 1.5,
-  margin: { top: 20, right: 20, bottom: 20, left: 20 },
-  sectionSpacing: 16,
-  avatarStyle: 'oneInch',
-};
-
 const FONT_OPTIONS = [
+  MAPLE_FONT_FAMILY,
   'Inter',
   'Georgia',
   'Helvetica',
@@ -255,19 +246,19 @@ function ThemeSection({
 
 // -- Main Theme Editor --
 
-interface ThemeEditorProps {
-  onClose?: () => void;
-}
-
-export function ThemeEditor({ onClose }: ThemeEditorProps) {
+export function ThemeEditor() {
   const t = useTranslations('themeEditor');
   const tRoot = useTranslations();
   const { currentResume } = useResumeStore();
 
-  const themeConfig: ThemeConfig = {
-    ...DEFAULT_THEME,
-    ...(currentResume?.themeConfig || {}),
-  };
+  const themeConfig = useMemo<ThemeConfig>(
+    () => ({
+      ...DEFAULT_THEME,
+      ...(currentResume?.themeConfig || {}),
+      avatarStyle: currentResume?.themeConfig?.avatarStyle || 'oneInch',
+    }),
+    [currentResume?.themeConfig]
+  );
 
   const updateTheme = useCallback(
     (updates: Partial<ThemeConfig>) => {
