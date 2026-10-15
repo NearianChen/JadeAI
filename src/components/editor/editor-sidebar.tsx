@@ -273,7 +273,6 @@ export function EditorSidebar({ sections, onAddSection, onReorderSections }: Edi
             <Separator className="my-3" />
             <div className="px-2 pb-4">
               <p className="mb-2 px-2 text-xs text-zinc-400">{t('sidebar.addSection')}</p>
-              <p className="mb-2 px-2 text-xs leading-relaxed text-zinc-400">{t('sidebar.repeatHint')}</p>
               <div className="space-y-0.5">
                 {availableSections.map(({ key, type, title }) => {
                   const Icon = sectionIcons[type] || LayoutList;
