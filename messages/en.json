@@ -139,12 +139,14 @@
     "sidebar": {
       "sections": "Sections",
       "addSection": "Add Section",
+      "repeatHint": "Add content sections more than once. Double-click a section title to rename it.",
       "dragHint": "Drag sections to reorder"
     },
     "sections": {
       "personalInfo": "Personal Info",
       "summary": "Summary",
       "workExperience": "Work Experience",
+      "internship": "Internship Experience",
       "education": "Education",
       "skills": "Skills",
       "projects": "Projects",

@@ -152,7 +152,7 @@ interface EditorSidebarProps {
 export function EditorSidebar({ sections, onAddSection, onReorderSections }: EditorSidebarProps) {
   const t = useTranslations('editor');
   const { selectedSectionId, selectSection } = useEditorStore();
-  const { updateSectionTitle } = useResumeStore();
+  const { currentResume, updateSectionTitle } = useResumeStore();
 
   const handleSelect = useCallback((id: string) => {
     selectSection(id);
@@ -200,17 +200,23 @@ export function EditorSidebar({ sections, onAddSection, onReorderSections }: Edi
   };
 
   const existingTypes = new Set(sections.map((s) => s.type));
-  const availableTypes = SECTION_TYPES.filter((type) => {
-    if (type === 'custom') return true;
-    return !existingTypes.has(type);
-  });
+  // Header information and the shared QR bar each use a single section.
+  // Content sections are independent instances and can share the same type.
+  const availableSections = SECTION_TYPES
+    .filter((type) => !['personal_info', 'qr_codes'].includes(type) || !existingTypes.has(type))
+    .flatMap((type) => {
+      const preset = { key: type, type, title: sectionTypeLabels[type] };
+      return type === 'work_experience'
+        ? [preset, { key: 'internship', type, title: t('sections.internship') }]
+        : [preset];
+    });
 
-  const handleAddSection = (type: SectionType) => {
+  const handleAddSection = (type: SectionType, title: string) => {
     const newSection: ResumeSection = {
       id: generateId(),
-      resumeId: '',
+      resumeId: currentResume?.id || '',
       type,
-      title: sectionTypeLabels[type] || type,
+      title,
       sortOrder: sections.length,
       visible: true,
       content: type === 'personal_info'
@@ -224,6 +230,7 @@ export function EditorSidebar({ sections, onAddSection, onReorderSections }: Edi
       updatedAt: new Date(),
     };
     onAddSection(newSection);
+    handleSelect(newSection.id);
   };
 
   return (
@@ -261,24 +268,26 @@ export function EditorSidebar({ sections, onAddSection, onReorderSections }: Edi
           </DndContext>
         </div>
 
-        {availableTypes.length > 0 && (
+        {availableSections.length > 0 && (
           <>
             <Separator className="my-3" />
             <div className="px-2 pb-4">
               <p className="mb-2 px-2 text-xs text-zinc-400">{t('sidebar.addSection')}</p>
+              <p className="mb-2 px-2 text-xs leading-relaxed text-zinc-400">{t('sidebar.repeatHint')}</p>
               <div className="space-y-0.5">
-                {availableTypes.map((type) => {
+                {availableSections.map(({ key, type, title }) => {
                   const Icon = sectionIcons[type] || LayoutList;
                   return (
                     <button
-                      key={type}
+                      key={key}
                       type="button"
+                      aria-label={`${t('sidebar.addSection')}: ${title}`}
                       className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-zinc-500 transition-colors duration-150 hover:bg-zinc-50 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-                      onClick={() => handleAddSection(type)}
+                      onClick={() => handleAddSection(type, title)}
                     >
                       <Plus className="h-3 w-3 shrink-0" />
                       <Icon className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{sectionTypeLabels[type]}</span>
+                      <span className="truncate">{title}</span>
                     </button>
                   );
                 })}
